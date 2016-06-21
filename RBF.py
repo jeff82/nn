@@ -5,7 +5,7 @@ import numpy
 
 from matplotlib import pyplot as plt
 
-eta=0.001
+eta=0.0001
 
 class RBF:
     def __init__(self, indim, numCenters, outdim):
@@ -45,7 +45,7 @@ class RBF:
         #self.ERR=zeros((X.shape[0], self.outdim), float)
         self.allE =zeros((1,self.outdim),float)
     def _calcErr(self,y,z):
-        self.ERR=y-z
+        self.ERR=z-y
         self.allE = (norm(self.ERR))
         #print "sigle err",self.ERR
         #print "all err",self.allE
@@ -53,20 +53,30 @@ class RBF:
 
     def gradindown(self,x):
         G = self._calcAct(x)
-        delta_Centre    = zeros((self.indim,self.numCenters),float)
-        delta_Beta      = zeros((self.indim,self.numCenters),float)
-        delta_Weight    = zeros((self.indim,self.numCenters),float)
+        delta_Centre    = zeros((self.numCenters,self.indim),float)
+        delta_Beta      = zeros((self.numCenters,self.indim),float)
+        delta_Weight    = zeros((self.numCenters,self.indim),float)
 
         sum1=sum2=sum3=0
         matCntr=[]
-        s3=(self.ERR*G)
-        for id, xi in enumerate(x):
+        s3=self.ERR*G
+        #print s3.size
+        for idd, xi in enumerate(x):
             matCntr=xi-self.centers
-            mat2=matCntr*matCntr
-            s1=s3[id].reshape(self.numCenters,1)*matCntr
-            s2=s3[id].reshape(self.numCenters,1)*mat2
-            sum1+=s1
-            print "cc",s1,sum1
+            mat2=array(map(sum,matCntr**2)).reshape(self.numCenters,1)
+            s1=s3[idd].reshape(self.numCenters,1)*matCntr
+            s2=s3[idd].reshape(self.numCenters,1)*mat2
+            sum1+=self.W*s1/(self.beta*self.beta)
+            sum2+=self.W*s2/(self.beta**3)
+            sum3+=s3[idd]
+            delta_Weight=sum3.reshape(self.numCenters,1)
+            #print idd,norm(self.ERR)**2,"dd",matCntr,"vvv",mat2
+       # print "cc",delta_Weight,"ssswww",self.W,"sss1",sum1
+        self.W-=eta*delta_Weight/float(x.shape[0])
+        self.centers-=eta*sum1/float(x.shape[0])
+        print self.beta
+        self.beta-=eta*sum2/float(x.shape[0])
+        
        
        
        
@@ -122,17 +132,17 @@ class RBF:
 
 if __name__ == '__main__':
 #----- 1D Example ------------------------------------------------
-    n = 5
-    ncenters=3
-    indim=2
+    n = 25
+    ncenters=5
+    indim=1
     outdim=1
 
-    x = mgrid[-1:1:complex(0,2*n)].reshape(n, 2)
+    x = mgrid[0:1:complex(0,indim*n)].reshape(n, indim)
     #x=numpy.ndarray.tolist(x)*indim
     #x=array(x).reshape(indim,n).T
     print x
     # set y and add random noise
-    y = array(sin(3*(x[:,0]+0.5)**3 - 1)+x[:,1]).reshape(n,outdim) 
+    y = array(sin(3*(x+0.5)**3 - 1))#+x[:,1]).reshape(n,outdim) 
     print "yy",y
     # y += random.normal(0, 0.1, y.shape)
     #  rbf regression
@@ -145,7 +155,11 @@ if __name__ == '__main__':
     rbf.train(x, y)
     z = rbf.test(x)
     rbf._calcErr(y,z)
-    rbf.gradindown(x)
+    for i in range(n):
+        z2 = rbf.test(x)
+        rbf._calcErr(y,z2)
+        rbf.gradindown(x)
+    z2 = rbf.test(x)
 
     # plot original data
     plt.figure(figsize=(12, 8))
@@ -153,6 +167,7 @@ if __name__ == '__main__':
 
     # plot learned model
     plt.plot(x, z, 'r-', linewidth=2)
+    plt.plot(x, z2, 'g-', linewidth=2)
     plt.plot(x,z-y)
 
     # plot rbfs
