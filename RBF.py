@@ -63,8 +63,10 @@ class RBF:
         for id, xi in enumerate(x):
             matCntr=xi-self.centers
             mat2=matCntr*matCntr
-            
-            print "cc",matCntr
+            s1=s3[id].reshape(self.numCenters,1)*matCntr
+            s2=s3[id].reshape(self.numCenters,1)*mat2
+            sum1+=s1
+            print "cc",s1,sum1
        
        
        
