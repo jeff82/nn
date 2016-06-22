@@ -120,7 +120,7 @@ class RBF:
 
 if __name__ == '__main__':
 #----- 1D Example ------------------------------------------------
-    n = 4
+    n = 5
     ncenters=3
     indim=2
     outdim=1
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     #x=array(x).reshape(indim,n).T
     print x
     # set y and add random noise
-    y = array(sin(3*(x[:,0]+0.5)**3 - 1)+x[:,1]).reshape(n,outdim)
+    y = array(sin(3*(x[:,0]+0.5)**3 - 1)+x[:,1]).reshape(n,outdim) 
     print "yy",y
     # y += random.normal(0, 0.1, y.shape)
     #  rbf regression
