@@ -5,7 +5,7 @@ import numpy
 
 from matplotlib import pyplot as plt
 
-eta=0.0001
+eta=0.01
 
 class RBF:
     def __init__(self, indim, numCenters, outdim):
@@ -24,6 +24,8 @@ class RBF:
 #        print d,"xxx",c-d
       #  print exp(-0.5/(self.beta[cid]*self.beta[cid]) * norm(c.T-d.T)**2),norm(c-d)**2,norm(c.T-d.T)**2,len(d),self.indim
         assert len(d) == self.indim
+        print c
+        print d
         return exp(-0.5/(self.beta[cid]*self.beta[cid]) * norm(c-d)**2)
     def _calcAct(self, X):
     #calculate activations of RBFs
@@ -40,12 +42,12 @@ class RBF:
         #print "center", self.centers
     # calculate activations of RBFs
         G = self._calcAct(X)
-        print "gg",G.shape  # calculate output weights (pseudoinverse)
+#        print "gg",G.shape  # calculate output weights (pseudoinverse)
         self.W = dot(pinv(G), Y)
         #self.ERR=zeros((X.shape[0], self.outdim), float)
         self.allE =zeros((1,self.outdim),float)
     def _calcErr(self,y,z):
-        self.ERR=z-y
+        self.ERR=y-z
         self.allE = (norm(self.ERR))
         #print "sigle err",self.ERR
         #print "all err",self.allE
@@ -59,6 +61,7 @@ class RBF:
 
         sum1=sum2=sum3=0
         matCntr=[]
+        mat2=[]
         s3=self.ERR*G
         #print s3.size
         for idd, xi in enumerate(x):
@@ -68,61 +71,15 @@ class RBF:
             s2=s3[idd].reshape(self.numCenters,1)*mat2
             sum1+=self.W*s1/(self.beta*self.beta)
             sum2+=self.W*s2/(self.beta**3)
-            sum3+=s3[idd]
+            sum3+=s3[idd].reshape(self.numCenters,1)
             delta_Weight=sum3.reshape(self.numCenters,1)
-            #print idd,norm(self.ERR)**2,"dd",matCntr,"vvv",mat2
-       # print "cc",delta_Weight,"ssswww",self.W,"sss1",sum1
+
         self.W-=eta*delta_Weight/float(x.shape[0])
         self.centers-=eta*sum1/float(x.shape[0])
-        print self.beta
+#        print self.beta
         self.beta-=eta*sum2/float(x.shape[0])
         
-       
-       
-       
-#       print "dddd"
-#        matCntr=numpy.ndarray.tolist(self.centers.T)
-#        print self.centers
-#        matCntr=array(array([matCntr]*G.shape[0]).T).reshape(self.numCenters,G.shape[0],self.indim)
-#        print "mmmm",G
-#        print matCntr,matCntr.shape
-#        print "xxx"
-#        print x,x.shape
-#        Dist=x-matCntr
-#        print Dist
-#        s3=(self.ERR*G)
-#        print s3 
-#        print s3.shape
-#        s1=s2=zeros((self.indim,G.shape[0],self.numCenters),float)
-#        print Dist.shape
-#        for i,dist in enumerate(Dist.T):
-#            print i
-#            s1[i]=s3*dist
-#            s2[i]=s3*dist*dist   
-#            
-#        #print s1,s2
-#        print s1.shape,s2.shape,s3.shape,Dist.shape
-        """
-        
-        """
-        
-#void updateParam(){
-#    for(int j=0;j<M;++j){m====centre num
-#        double delta_center=0.0,delta_delta=0.0,delta_weight=0.0;
-#        double sum1=0.0,sum2=0.0,sum3=0.0;
-#        for(int i=0;i<P;++i){p  train num
-#            sum1+=error[i]*exp(-1.0*(X[i]-center[j])*(X[i]-center[j])/(2*delta[j]*delta[j]))*(X[i]-center[j]);
-#            sum2+=error[i]*exp(-1.0*(X[i]-center[j])*(X[i]-center[j])/(2*delta[j]*delta[j]))*(X[i]-center[j])*(X[i]-center[j]);
-#            sum3+=error[i]*exp(-1.0*(X[i]-center[j])*(X[i]-center[j])/(2*delta[j]*delta[j]));
-#        }
-#        delta_center=eta*Weight[j]/(delta[j]*delta[j])*sum1;
-#        delta_delta=eta*Weight[j]/pow(delta[j],3)*sum2;
-#        delta_weight=eta*sum3;
-#        center[j]+=delta_center;
-#        delta[j]+=delta_delta;
-#        Weight[j]+=delta_weight;
-#    }
-#}
+
 
     def test(self, X):
         """ X: matrix of dimensions n x indim """
@@ -138,14 +95,8 @@ if __name__ == '__main__':
     outdim=1
 
     x = mgrid[0:1:complex(0,indim*n)].reshape(n, indim)
-    #x=numpy.ndarray.tolist(x)*indim
-    #x=array(x).reshape(indim,n).T
-    print x
-    # set y and add random noise
-    y = array(sin(3*(x+0.5)**3 - 1))#+x[:,1]).reshape(n,outdim) 
-    print "yy",y
-    # y += random.normal(0, 0.1, y.shape)
-    #  rbf regression
+
+    y = array(sin(3*(x+0.5)**3 - 1))
     rbf = RBF(indim, ncenters, outdim)
     rbf.beta=mgrid[0.2:0.2:complex(0,ncenters)].reshape(ncenters, 1)
     rnd_idx = random.permutation(x.shape[0])[:rbf.numCenters]
@@ -155,7 +106,7 @@ if __name__ == '__main__':
     rbf.train(x, y)
     z = rbf.test(x)
     rbf._calcErr(y,z)
-    for i in range(n):
+    for i in range(200):
         z2 = rbf.test(x)
         rbf._calcErr(y,z2)
         rbf.gradindown(x)
