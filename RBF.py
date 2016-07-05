@@ -5,7 +5,7 @@ import numpy
 
 from matplotlib import pyplot as plt
 
-eta=0.0001
+eta=0.01
 
 class RBF:
     def __init__(self, indim, numCenters, outdim):
@@ -24,9 +24,16 @@ class RBF:
 #        print c,"ccc"
 #        print d,"xxx",c-d
       #  print exp(-0.5/(self.beta[cid]*self.beta[cid]) * norm(c.T-d.T)**2),norm(c-d)**2,norm(c.T-d.T)**2,len(d),self.indim
+<<<<<<< HEAD
+        assert len(d) == self.indim
+        print c
+        print d
+        return exp(-0.5/(self.beta[cid]*self.beta[cid]) * norm(c-d)**2)
+=======
         #if len(d) != self.indim:
          #   print d,"d",self.indim,len(d)
         return exp(-0.5/(self.beta[cid]**2) * norm(c-d)**2)
+>>>>>>> origin/master
     def _calcAct(self, X):
     #calculate activations of RBFs
         G = zeros((X.shape[0], self.numCenters), float)
@@ -42,12 +49,12 @@ class RBF:
         #print "center", self.centers
     # calculate activations of RBFs
         G = self._calcAct(X)
-        print "gg",G.shape  # calculate output weights (pseudoinverse)
+#        print "gg",G.shape  # calculate output weights (pseudoinverse)
         self.W = dot(pinv(G), Y)
         #self.ERR=zeros((X.shape[0], self.outdim), float)
         self.allE =zeros((1,self.outdim),float)
     def _calcErr(self,y,z):
-        self.ERR=z-y
+        self.ERR=y-z
         self.allE = (norm(self.ERR))
         #print "sigle err",self.ERR
         #print "all err",self.allE
@@ -63,6 +70,26 @@ class RBF:
 
         matCntr=[]
         mat2=[]
+<<<<<<< HEAD
+        s3=self.ERR*G
+        #print s3.size
+        for idd, xi in enumerate(x):
+            matCntr=xi-self.centers
+            mat2=array(map(sum,matCntr**2)).reshape(self.numCenters,1)
+            s1=s3[idd].reshape(self.numCenters,1)*matCntr
+            s2=s3[idd].reshape(self.numCenters,1)*mat2
+            sum1+=self.W*s1/(self.beta*self.beta)
+            sum2+=self.W*s2/(self.beta**3)
+            sum3+=s3[idd].reshape(self.numCenters,1)
+            delta_Weight=sum3.reshape(self.numCenters,1)
+
+        self.W-=eta*delta_Weight/float(x.shape[0])
+        self.centers-=eta*sum1/float(x.shape[0])
+#        print self.beta
+        self.beta-=eta*sum2/float(x.shape[0])
+        
+
+=======
         self.cost=0
         #print s3.size
         if mode == "instantaneous":
@@ -103,6 +130,7 @@ class RBF:
                 self.beta-=eta*delta_Beta/float(self.indim)
    
       
+>>>>>>> origin/master
 
     def test(self, X):
         """ X: matrix of dimensions n x indim """
@@ -118,6 +146,10 @@ if __name__ == '__main__':
     outdim=1
 
     x = mgrid[0:1:complex(0,indim*n)].reshape(n, indim)
+<<<<<<< HEAD
+
+    y = array(sin(3*(x+0.5)**3 - 1))
+=======
     #x=numpy.ndarray.tolist(x)*indim
     #x=array(x).reshape(indim,n).T
     print x
@@ -127,6 +159,7 @@ if __name__ == '__main__':
     print "yy",y
     # y += random.normal(0, 0.1, y.shape)
     #  rbf regression
+>>>>>>> origin/master
     rbf = RBF(indim, ncenters, outdim)
     rbf.beta=mgrid[0.2:0.2:complex(0,ncenters)].reshape(ncenters, 1)
     rnd_idx = random.permutation(x.shape[0])
@@ -135,6 +168,14 @@ if __name__ == '__main__':
     
     
     rbf.train(x, y)
+<<<<<<< HEAD
+    z = rbf.test(x)
+    rbf._calcErr(y,z)
+    for i in range(200):
+        z2 = rbf.test(x)
+        rbf._calcErr(y,z2)
+        rbf.gradindown(x)
+=======
 #    z = rbf.test(x)
 #    z2 = rbf.test(x)
 #    rbf._calcErr(y,z2)
@@ -142,6 +183,7 @@ if __name__ == '__main__':
         #rbf._calcErr(y,z2)
         rbf.gradindown(x,y,"overall")
         print rbf.cost
+>>>>>>> origin/master
     z2 = rbf.test(x)
 
     # plot original data

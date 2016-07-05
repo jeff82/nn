@@ -74,8 +74,7 @@ save 'k2' k2
   plot(z,x2)
   plot(z,(x1+x2)/2)
   hold off
-  set(gca,'xlim',[0,40]);
-  set(gca,'ylim',[0,25]);
+
   
 eg = 0.02e-8; % sum-squared error goal
 sc = 1;    % spread constant
