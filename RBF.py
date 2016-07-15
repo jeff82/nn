@@ -14,16 +14,16 @@ class RBF:
         self.numCenters = numCenters
         self.centers = random.random((numCenters,indim))
         #numpy.array([random.uniform(2, 2, 2) for i in xrange(numCenters)]).reshape(indim,numCenters)
-        self.beta = random.random((self.numCenters,1))
-        self.W = random.random((self.numCenters, self.outdim))*2-1
+        self.beta = random.random((1,self.numCenters))
+        self.W = random.random((self.numCenters, self.outdim))
         self.ERR=[]
         self.allE=[]
-        self.cost=0
 
     def _basisfunc(self,c, d,cid):
 #        print c,"ccc"
 #        print d,"xxx",c-d
       #  print exp(-0.5/(self.beta[cid]*self.beta[cid]) * norm(c.T-d.T)**2),norm(c-d)**2,norm(c.T-d.T)**2,len(d),self.indim
+<<<<<<< HEAD
 <<<<<<< HEAD
         assert len(d) == self.indim
         print c
@@ -34,6 +34,10 @@ class RBF:
          #   print d,"d",self.indim,len(d)
         return exp(-0.5/(self.beta[cid]**2) * norm(c-d)**2)
 >>>>>>> origin/master
+=======
+        assert len(d) == self.indim
+        return exp(-0.5/(self.beta[cid]*self.beta[cid]) * norm(c-d)**2)
+>>>>>>> parent of 9969bb5... -a
     def _calcAct(self, X):
     #calculate activations of RBFs
         G = zeros((X.shape[0], self.numCenters), float)
@@ -60,15 +64,15 @@ class RBF:
         #print "all err",self.allE
 
 
-    def gradindown(self,x,y,mode="instantaneous"):
+    def gradindown(self,x):
+        G = self._calcAct(x)
         delta_Centre    = zeros((self.numCenters,self.indim),float)
         delta_Beta      = zeros((self.numCenters,self.indim),float)
         delta_Weight    = zeros((self.numCenters,self.indim),float)
-        output          = zeros((self.outdim,1),float)
-        err             = zeros((self.outdim,1),float)
-        
 
+        sum1=sum2=sum3=0
         matCntr=[]
+<<<<<<< HEAD
         mat2=[]
 <<<<<<< HEAD
         s3=self.ERR*G
@@ -131,6 +135,72 @@ class RBF:
    
       
 >>>>>>> origin/master
+=======
+        s3=self.ERR*G
+        #print s3.size
+        for idd, xi in enumerate(x):
+            matCntr=xi-self.centers
+            mat2=array(map(sum,matCntr**2)).reshape(self.numCenters,1)
+            s1=s3[idd].reshape(self.numCenters,1)*matCntr
+            s2=s3[idd].reshape(self.numCenters,1)*mat2
+            sum1+=self.W*s1/(self.beta*self.beta)
+            sum2+=self.W*s2/(self.beta**3)
+            sum3+=s3[idd]
+            delta_Weight=sum3.reshape(self.numCenters,1)
+            #print idd,norm(self.ERR)**2,"dd",matCntr,"vvv",mat2
+       # print "cc",delta_Weight,"ssswww",self.W,"sss1",sum1
+        self.W-=eta*delta_Weight/float(x.shape[0])
+        self.centers-=eta*sum1/float(x.shape[0])
+        print self.beta
+        self.beta-=eta*sum2/float(x.shape[0])
+        
+       
+       
+       
+#       print "dddd"
+#        matCntr=numpy.ndarray.tolist(self.centers.T)
+#        print self.centers
+#        matCntr=array(array([matCntr]*G.shape[0]).T).reshape(self.numCenters,G.shape[0],self.indim)
+#        print "mmmm",G
+#        print matCntr,matCntr.shape
+#        print "xxx"
+#        print x,x.shape
+#        Dist=x-matCntr
+#        print Dist
+#        s3=(self.ERR*G)
+#        print s3 
+#        print s3.shape
+#        s1=s2=zeros((self.indim,G.shape[0],self.numCenters),float)
+#        print Dist.shape
+#        for i,dist in enumerate(Dist.T):
+#            print i
+#            s1[i]=s3*dist
+#            s2[i]=s3*dist*dist   
+#            
+#        #print s1,s2
+#        print s1.shape,s2.shape,s3.shape,Dist.shape
+        """
+        
+        """
+        
+#void updateParam(){
+#    for(int j=0;j<M;++j){m====centre num
+#        double delta_center=0.0,delta_delta=0.0,delta_weight=0.0;
+#        double sum1=0.0,sum2=0.0,sum3=0.0;
+#        for(int i=0;i<P;++i){p  train num
+#            sum1+=error[i]*exp(-1.0*(X[i]-center[j])*(X[i]-center[j])/(2*delta[j]*delta[j]))*(X[i]-center[j]);
+#            sum2+=error[i]*exp(-1.0*(X[i]-center[j])*(X[i]-center[j])/(2*delta[j]*delta[j]))*(X[i]-center[j])*(X[i]-center[j]);
+#            sum3+=error[i]*exp(-1.0*(X[i]-center[j])*(X[i]-center[j])/(2*delta[j]*delta[j]));
+#        }
+#        delta_center=eta*Weight[j]/(delta[j]*delta[j])*sum1;
+#        delta_delta=eta*Weight[j]/pow(delta[j],3)*sum2;
+#        delta_weight=eta*sum3;
+#        center[j]+=delta_center;
+#        delta[j]+=delta_delta;
+#        Weight[j]+=delta_weight;
+#    }
+#}
+>>>>>>> parent of 9969bb5... -a
 
     def test(self, X):
         """ X: matrix of dimensions n x indim """
@@ -140,8 +210,8 @@ class RBF:
 
 if __name__ == '__main__':
 #----- 1D Example ------------------------------------------------
-    n = 100
-    ncenters=30
+    n = 25
+    ncenters=5
     indim=1
     outdim=1
 
@@ -155,19 +225,18 @@ if __name__ == '__main__':
     print x
     # set y and add random noise
     y = array(sin(3*(x+0.5)**3 - 1))#+x[:,1]).reshape(n,outdim) 
-   # y=2*x
     print "yy",y
     # y += random.normal(0, 0.1, y.shape)
     #  rbf regression
 >>>>>>> origin/master
     rbf = RBF(indim, ncenters, outdim)
     rbf.beta=mgrid[0.2:0.2:complex(0,ncenters)].reshape(ncenters, 1)
-    rnd_idx = random.permutation(x.shape[0])
-    rbf.centers = array([x[random.randint(0,x.shape[0],1)[0]] for i in range(ncenters)])
-    print rbf.W
+    rnd_idx = random.permutation(x.shape[0])[:rbf.numCenters]
+    rbf.centers = array([x[i,:] for i in rnd_idx])
     
     
     rbf.train(x, y)
+<<<<<<< HEAD
 <<<<<<< HEAD
     z = rbf.test(x)
     rbf._calcErr(y,z)
@@ -184,6 +253,14 @@ if __name__ == '__main__':
         rbf.gradindown(x,y,"overall")
         print rbf.cost
 >>>>>>> origin/master
+=======
+    z = rbf.test(x)
+    rbf._calcErr(y,z)
+    for i in range(n):
+        z2 = rbf.test(x)
+        rbf._calcErr(y,z2)
+        rbf.gradindown(x)
+>>>>>>> parent of 9969bb5... -a
     z2 = rbf.test(x)
 
     # plot original data
@@ -191,10 +268,9 @@ if __name__ == '__main__':
     plt.plot(x, y, 'k-')
 
     # plot learned model
-    #plt.plot(x, z, 'r-', linewidth=2)
+    plt.plot(x, z, 'r-', linewidth=2)
     plt.plot(x, z2, 'g-', linewidth=2)
-    plt.plot(x,z2-y)
-    print norm(z2-y)**2,(norm(z2-y)**2)**0.5
+    plt.plot(x,z-y)
 
     # plot rbfs
     plt.plot(rbf.centers, zeros(rbf.numCenters), 'gs')
