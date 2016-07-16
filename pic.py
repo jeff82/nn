@@ -8,11 +8,13 @@ import matplotlib.pyplot as plt
 import math
 import random
 import copy
+import os
 #test 
 #from BasicMultilayerNeuralNetwork import BMNN2
 
-dir=r'E:\py\nn\dcfls\fuck pic\subpic'
-name='\grid12xex.jpg'
+#dir=r'E:\py\nn\dcfls\fuck pic\subpic'
+dir=os.getcwd()+r'/dcfls/fuck pic/subpic'
+name='/grid1xx.jpg'
 img = Image.open(dir+name)  
 #Image._show(img)
 # rgb2xyz = (
@@ -30,7 +32,7 @@ def readimg():
         for h in range(H):
             pixel[w,h,(range(3))] = numpy.array(im.getpixel((w, h)) )
             pixel[w,h,3]=sum(pixel[w,h,range(3)])/3
-    return pixel
+    return pixel[:,:,2]
 
 
 
