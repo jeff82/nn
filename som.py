@@ -63,7 +63,7 @@ class SOM():
         
         # Best maching unit
         idx = numpy.argmin(dists)
-        print "Epoch ", self.epoch, ": ", (idx/x, idx%y), "; Sigma: ", self.sigma, "; alpha: ", self.alpha
+       # print "Epoch ", self.epoch, ": ", (idx/x, idx%y), "; Sigma: ", self.sigma, "; alpha: ", self.alpha
         
         # Linearly reducing the width of Gaussian Kernel
         self.sigma = self.sigma*self.sigma_decay
@@ -106,13 +106,19 @@ def _split_(inimg, splitsz,discrete=5):
     print sx,sy
     sub=0
     sub=min(sx,sy)/discrete
-    spic=numpy.zeros((sub,splitsz,splitsz))
+    print sub
+    spic=numpy.zeros((sub**2,splitsz,splitsz),dtype='uint8')
+    #out_array = numpy.zeros(out_shape, dtype='uint8')
     for imw in numpy.arange(1,sub,discrete):
         for imh in numpy.arange(1,sub,discrete):
-            spic[imw*imh,:,:]=inimg[imw:imw+splitsz,imw*imh:imw*imh+splitsz]
+            try:
+                spic[imw*imh,0:splitsz,0:splitsz]=inimg[imw:imw+splitsz,imh:imh+splitsz]
+            except:
+                print imw,imh,splitsz
+            print spic[imw*imh,:,:]
             img = Image.fromarray(spic[imw*imh,:,:])
             print img
-            img.save("som_results"+str(imw*imh)+".bmp")
+            img.save("som_results"+str(imw*imh)+".jpg")
             
             print "NO.",imw*imh
         

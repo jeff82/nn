@@ -13,8 +13,10 @@ import os
 #from BasicMultilayerNeuralNetwork import BMNN2
 
 #dir=r'E:\py\nn\dcfls\fuck pic\subpic'
-dir=os.getcwd()+r'/dcfls/fuck pic/subpic'
-name='/grid1xx.jpg'
+#dir=os.getcwd()+r'/dcfls/fuck pic/subpic'
+dir=os.getcwd()+r'\dcfls\fuck pic\subpic'
+#name='/grid1xx.jpg'
+name='\grid1xx.jpg'
 img = Image.open(dir+name)  
 #Image._show(img)
 # rgb2xyz = (
@@ -34,7 +36,25 @@ def readimg():
             pixel[w,h,3]=sum(pixel[w,h,range(3)])/3
     return pixel[:,:,2]
 
+def scale(X, eps=1e-8):
+  return (X - X.min())/ (X.max() + eps)
 
+
+def make_tile(X, img_shape, tile_shape, tile_spacing=(0, 0)):
+    out_shape = [(ishp + tsp) * tshp - tsp for ishp, tshp, tsp in zip(img_shape, tile_shape, tile_spacing)]
+    H, W = img_shape
+    Hs, Ws = tile_spacing
+    out_array = numpy.zeros(out_shape, dtype='uint8')
+    for tile_row in xrange(tile_shape[0]):
+      for tile_col in xrange(tile_shape[1]):
+          if tile_row * tile_shape[1] + tile_col < X.shape[0]:
+              img = scale(X[tile_row * tile_shape[1] + tile_col].reshape(img_shape))
+              out_array[
+                  tile_row * (H+Hs): tile_row * (H + Hs) + H,
+                  tile_col * (W+Ws): tile_col * (W + Ws) + W
+                  ] \
+                  = img * 255
+    return out_array
 
 
 
