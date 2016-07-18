@@ -94,6 +94,8 @@ from PIL import Image
 from pic import readimg
 import gzip
 import cPickle
+import os
+dir=os.getcwd()+r'\dcfls\fuck pic\subpic'
 
 def load_mnist():   
     f = gzip.open("mnist/mnist.pkl.gz", 'rb')
@@ -101,26 +103,31 @@ def load_mnist():
     f.close()  
     return train[0][:20000],train[1][:20000]
 
-def _split_(inimg, splitsz,discrete=5):
+def _split_(inimg, splitsz,discrete=10):
     sx,sy=inimg.shape
     print sx,sy
     sub=0
     sub=min(sx,sy)/discrete
     print sub
     spic=numpy.zeros((sub**2,splitsz,splitsz),dtype='uint8')
+    i=0
     #out_array = numpy.zeros(out_shape, dtype='uint8')
-    for imw in numpy.arange(1,sub,discrete):
-        for imh in numpy.arange(1,sub,discrete):
+    for imw in numpy.arange(1,min(sx,sy),discrete):
+        for imh in numpy.arange(1,min(sx,sy),discrete):
             try:
-                spic[imw*imh,0:splitsz,0:splitsz]=inimg[imw:imw+splitsz,imh:imh+splitsz]
+                spic[i,0:splitsz,0:splitsz]=inimg[imw:imw+splitsz,imh:imh+splitsz]
+                img = Image.fromarray(spic[i ,:,:])
+           # print img
+                img.save(dir+"\som_results"+str(i)+".jpg")
             except:
                 print imw,imh,splitsz
-            print spic[imw*imh,:,:]
-            img = Image.fromarray(spic[imw*imh,:,:])
-            print img
-            img.save("som_results"+str(imw*imh)+".jpg")
+            i+=1
+            #print spic[imw*imh,:,:]
+            #img = Image.fromarray(spic[imw*imh,:,:])
+           # print img
             
-            print "NO.",imw*imh
+            
+            #print "NO.",imw*imh
         
     
 def demo():
