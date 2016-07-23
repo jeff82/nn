@@ -102,17 +102,18 @@ def load_mnist():
     return train[0][:20000],train[1][:20000]
 
 def _split_(inimg, splitsz,discrete=5):
-    sx,sy=inimg.shape
+    sx,sy,rgb=inimg.shape
     print sx,sy
     sub=0
     sub=min(sx,sy)/discrete
-    spic=numpy.zeros((sub,splitsz,splitsz))
+    sub=20
+    spic=numpy.zeros((sub,splitsz,splitsz,3))
     for imw in numpy.arange(1,sub,discrete):
         for imh in numpy.arange(1,sub,discrete):
-            spic[imw*imh,:,:]=inimg[imw:imw+splitsz,imw*imh:imw*imh+splitsz]
-            img = Image.fromarray(spic[imw*imh,:,:])
+            spic[imw*imh,:,:,:]=inimg[imw:imw+splitsz,imw*imh:imw*imh+splitsz,:]
+            img = Image.fromarray(inimg[imw:imw+splitsz,imw*imh:imw*imh+splitsz,:])
             print img
-            img.save("som_results"+str(imw*imh)+".bmp")
+            img.save(r'./dcfls/fuck pic/subpic'+"som_results"+str(imw*imh)+".jpg")
             
             print "NO.",imw*imh
         
