@@ -15,9 +15,10 @@ import os
 #dir=r'E:\py\nn\dcfls\fuck pic\subpic'
 #dir=os.getcwd()+r'/dcfls/fuck pic/subpic'
 
-dir=os.getcwd()+r'/dcfls/fuck pic/subpic'
+dir=os.getcwd()+r'\dcfls\fuck pic\subpic'
+#name='/grid1xx.jpg'
+name='\grid1xx.jpg'
 
-name='/grid1xx.jpg'
 img = Image.open(dir+name)  
 #Image._show(img)
 # rgb2xyz = (
@@ -43,9 +44,11 @@ def scale(X, eps=1e-8):
   return (X - X.min())/ (X.max() + eps)
 
 
+
+
+
 def make_tile(X, img_shape, tile_shape, tile_spacing=(0, 0)):
-    out_shape = [(ishp + tsp) * tshp - tsp for ishp, tshp, tsp
-                      in zip(img_shape, tile_shape, tile_spacing)]
+    out_shape = [(ishp + tsp) * tshp - tsp for ishp, tshp, tsp in zip(img_shape, tile_shape, tile_spacing)]
     H, W = img_shape
     Hs, Ws = tile_spacing
     out_array = numpy.zeros(out_shape, dtype='uint8')
@@ -59,7 +62,6 @@ def make_tile(X, img_shape, tile_shape, tile_spacing=(0, 0)):
                   ] \
                   = img * 255
     return out_array
-
 
 
 

@@ -63,7 +63,7 @@ class SOM():
         
         # Best maching unit
         idx = numpy.argmin(dists)
-        print "Epoch ", self.epoch, ": ", (idx/x, idx%y), "; Sigma: ", self.sigma, "; alpha: ", self.alpha
+       # print "Epoch ", self.epoch, ": ", (idx/x, idx%y), "; Sigma: ", self.sigma, "; alpha: ", self.alpha
         
         # Linearly reducing the width of Gaussian Kernel
         self.sigma = self.sigma*self.sigma_decay
@@ -94,6 +94,8 @@ from PIL import Image
 from pic import readimg
 import gzip
 import cPickle
+import os
+dir=os.getcwd()+r'\dcfls\fuck pic\subpic'
 
 def load_mnist():   
     f = gzip.open("mnist/mnist.pkl.gz", 'rb')
@@ -101,21 +103,32 @@ def load_mnist():
     f.close()  
     return train[0][:20000],train[1][:20000]
 
-def _split_(inimg, splitsz,discrete=5):
-    sx,sy,rgb=inimg.shape
+
+def _split_(inimg, splitsz,discrete=10):
+    sx,sy=inimg.shape
     print sx,sy
     sub=0
     sub=min(sx,sy)/discrete
-    sub=20
-    spic=numpy.zeros((sub,splitsz,splitsz,3))
-    for imw in numpy.arange(1,sub,discrete):
-        for imh in numpy.arange(1,sub,discrete):
-            spic[imw*imh,:,:,:]=inimg[imw:imw+splitsz,imw*imh:imw*imh+splitsz,:]
-            img = Image.fromarray(inimg[imw:imw+splitsz,imw*imh:imw*imh+splitsz,:])
-            print img
-            img.save(r'./dcfls/fuck pic/subpic'+"som_results"+str(imw*imh)+".jpg")
+    print sub
+    spic=numpy.zeros((sub**2,splitsz,splitsz),dtype='uint8')
+    i=0
+    #out_array = numpy.zeros(out_shape, dtype='uint8')
+    for imw in numpy.arange(1,min(sx,sy),discrete):
+        for imh in numpy.arange(1,min(sx,sy),discrete):
+            try:
+                spic[i,0:splitsz,0:splitsz]=inimg[imw:imw+splitsz,imh:imh+splitsz]
+                img = Image.fromarray(spic[i ,:,:])
+           # print img
+                img.save(dir+"\som_results"+str(i)+".jpg")
+            except:
+                print imw,imh,splitsz
+            i+=1
+            #print spic[imw*imh,:,:]
+            #img = Image.fromarray(spic[imw*imh,:,:])
+           # print img
             
-            print "NO.",imw*imh
+            
+            #print "NO.",imw*imh
         
     
 def demo():
