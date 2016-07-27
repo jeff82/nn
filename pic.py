@@ -9,15 +9,19 @@ import math
 import random
 import copy
 import os
+import platform
 #test 
 #from BasicMultilayerNeuralNetwork import BMNN2
 
 #dir=r'E:\py\nn\dcfls\fuck pic\subpic'
-#dir=os.getcwd()+r'/dcfls/fuck pic/subpic'
+if platform.system() is 'Windows':
+    dir=os.getcwd()+r'\dcfls\fuck pic\subpic'
+    name='\grid1xx.jpg'
+else:
+   dir=os.getcwd()+r'/dcfls/fuck pic/subpic'
+   name='/grid1xx.jpg'
+#
 
-dir=os.getcwd()+r'\dcfls\fuck pic\subpic'
-#name='/grid1xx.jpg'
-name='\grid1xx.jpg'
 
 img = Image.open(dir+name)  
 #Image._show(img)
@@ -35,7 +39,7 @@ def readimg():
     for w in range(W):
         for h in range(H):
             pixel[w,h,(range(3))] = numpy.array(im.getpixel((w, h)) )
-            pixel[w,h,3]=sum(pixel[w,h,range(3)])/3
+            pixel[w,h,0:3]=sum(pixel[w,h,range(3)])/3
     return pixel,img
 
 
@@ -292,7 +296,7 @@ def getTrainAccuracy(numofFilter,filter_size,pooling_size,ImageNum,W_k,B,MLP):
     return  float(accuracycount)/float(ImageNum)
     
 if __name__ == '__main__':
-    MNISTimage=readimg()
+    MNISTimage,y=readimg()
     MNISTlabel=[]
 #    MNISTimage,num1=loadMNISTimage("F:\Machine Learning\UFLDL\data\common\\train-images-idx3-ubyte",1)
 #    MNISTlabel,num2=loadMNISTlabels("F:\Machine Learning\UFLDL\data\common\\train-labels-idx1-ubyte",1)
