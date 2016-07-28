@@ -223,8 +223,8 @@ class Corner():
                A=conv(numpy.array(difx**2),numpy.array(range(self.windowsz)))
                B=conv(numpy.array(dify**2),numpy.array(range(self.windowsz)))
                C=conv(numpy.array(difx*dify),numpy.array(range(self.windowsz)))
-           pass
-       return
+           
+       return A,B,C
                 
         
     
