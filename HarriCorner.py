@@ -10,11 +10,28 @@ Created on Thu Jul 28 16:04:32 2016
 # -*- coding:gb2312 -*-
 #import cv2
 import numpy as np
+import numpy
 import matplotlib.pyplot as plt
 from skimage.feature import canny
 from pic import *
 from scipy.ndimage import filters
 
+X_w=numpy.array([1,0,-1])
+Y_w=numpy.array([1,0,-1])
+def conv(dif,G,windowsz=3):
+    '''
+    2D assumed
+    '''
+    dx,dy=dif.shape
+    dxg,dyg=G.shape
+    sum=0
+    
+#    for x in range(windowsz):
+#        for y in range(windowsz):
+#            cv=numpy.dot(dif[x,y],G[x,y])
+#            sum+=cv
+    sum=numpy.dot(numpy.dot(G[0].reshape(1,windowsz),dif),G[1].reshape(windowsz,1))    
+    return sum
 # from scipy.ndimage import *
 def Harris(img,op='H',w=4,k=0.1):
     # below is wrong for trying to create a
@@ -24,7 +41,7 @@ def Harris(img,op='H',w=4,k=0.1):
     img = np.array(img,dtype=np.float32)
     # row,col = img.shape
     # out = np.zeros(img.shape)
-    difx,dify=np.gradient(img)
+    #difx,dify=np.gradient(img)
 
     # detect edge with cv2.Sobel
     # EdgeX = cv2.Sobel(img, cv2.CV_32FC1, 1, 0)
@@ -33,9 +50,12 @@ def Harris(img,op='H',w=4,k=0.1):
 
     # or use canny edge detector from skimage.feature
     Mag = canny(img, 1, 0.4, 0.2)
-    plt.figure()
-    plt.imshow(Mag)
+#    plt.figure()
+#    plt.imshow(Mag)
+    G[0]=Y_w
+    G[1]=X_w
     
+    difx,dify=np.gradient(img)
 
     # compute autocorralation
     difx2=difx**2
@@ -79,10 +99,16 @@ if __name__ == '__main__':
 #    image = cv2.imread('u.tif', flags=0)
 #    image = cv2.resize(image, (100, 100))
     X,img=readimg()
-    corimg = Harris(X[:,:,2], op='TI')
+    corimg = Harris(X[:,:,0], op='TI')
     #plt.subplot(121);
     plt.figure()
-    plt.imshow(X[:,:,1]);plt.title('Original')
+    plt.imshow(X[:,:,0]);plt.title('Original')
+    spic=numpy.zeros((corimg.shape),dtype='uint8')
+    #spic[xx,xx]=[[uint8(dd[0]),uint8(dd[1])] for dd,xx in corimg[:,:,0]] 
+    spic=map(map, [numpy.int8, numpy.int8], corimg[:,:])
+    img = Image.fromarray(numpy.array(spic))
+   
+    img.save(dir+"\ss"+".jpg")
     #plt.subplot(122);
     plt.figure()
     plt.imshow(corimg,);plt.title('Harris Corner')
